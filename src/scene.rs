@@ -4,7 +4,7 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    _asset_server: Res<AssetServer>,   
+    _asset_server: Res<AssetServer>,
 ) {
     // ground plane
     commands.spawn_bundle(PbrBundle {
@@ -25,8 +25,6 @@ fn setup(
         ..default()
     });
 }
-
-
 
 pub struct Scene;
 

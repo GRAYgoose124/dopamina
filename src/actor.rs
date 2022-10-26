@@ -1,4 +1,4 @@
-use bevy::{prelude::*, ecs::query::WorldQuery};
+use bevy::{ecs::query::WorldQuery, prelude::*};
 
 #[derive(Component, Debug)]
 struct Name(String);
@@ -84,7 +84,11 @@ pub struct ActorObjectBundle {
 }
 
 impl ActorObjectBundle {
-    pub fn new(transform: Transform, mesh: Handle<Mesh>, material: Handle<StandardMaterial>) -> Self {
+    pub fn new(
+        transform: Transform,
+        mesh: Handle<Mesh>,
+        material: Handle<StandardMaterial>,
+    ) -> Self {
         Self {
             transform,
             global_transform: GlobalTransform::default(),
@@ -131,7 +135,7 @@ pub struct ActorQuery<'a> {
 fn spawn_actors(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>
+    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let mesh = meshes.add(Mesh::from(shape::Cube { size: 1.0 }));
     let mat = materials.add(Color::rgb(0.8, 0.7, 0.6).into());
@@ -149,9 +153,7 @@ fn spawn_actors(
 }
 
 fn iterate_actors(query: Query<ActorQuery>) {
-    for actor in query.iter() {
-        println!("Actor: {}", actor.name.0);
-    }
+    for _actor in query.iter() {}
 }
 
 pub struct ActorSystem;
