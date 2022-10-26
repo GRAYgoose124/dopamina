@@ -1,9 +1,5 @@
 use bevy::{prelude::*, ecs::query::WorldQuery};
 
-pub mod prelude {
-    pub use crate::actor::ActorPlugin;
-}
-
 #[derive(Component, Debug)]
 struct Name(String);
 #[derive(Component, Debug)]
@@ -33,7 +29,7 @@ struct Wisdom(f32);
 struct Charisma(f32);
 
 #[derive(Bundle, Debug)]
-struct ActorStatBundle {
+pub struct ActorStatBundle {
     name: Name,
     is_player: IsPlayer,
 
@@ -80,15 +76,26 @@ impl Default for ActorStatBundle {
 }
 
 #[derive(Bundle, Debug)]
-struct ActorObjectBundle {
+pub struct ActorObjectBundle {
     transform: Transform,
     global_transform: GlobalTransform,
     mesh: Handle<Mesh>,
     material: Handle<StandardMaterial>,
 }
 
+impl ActorObjectBundle {
+    pub fn new(transform: Transform, mesh: Handle<Mesh>, material: Handle<StandardMaterial>) -> Self {
+        Self {
+            transform,
+            global_transform: GlobalTransform::default(),
+            mesh,
+            material,
+        }
+    }
+}
+
 #[derive(Bundle)]
-struct ActorBundle {
+pub struct ActorBundle {
     // 3D object data
     #[bundle]
     object: ActorObjectBundle,
@@ -98,14 +105,27 @@ struct ActorBundle {
     stats: ActorStatBundle,
 }
 
-// TODO: maybe make this pub.
-#[derive(WorldQuery)]
-struct ActorQuery<'a> {
-    name: &'a Name,
+impl ActorBundle {
+    pub fn new(
+        transform: Transform,
+        mesh: Handle<Mesh>,
+        material: Handle<StandardMaterial>,
+        name: String,
+        is_player: bool,
+    ) -> Self {
+        Self {
+            object: ActorObjectBundle::new(transform, mesh, material),
+            stats: ActorStatBundle::new(name, is_player),
+        }
+    }
+}
 
+// TODO: maybe make this pub.
+/// Simple Query which provides an iterator over all actors, letting you access them publically.
+#[derive(WorldQuery)]
+pub struct ActorQuery<'a> {
+    name: &'a Name,
     transform: &'a Transform,
-    mesh: &'a Handle<Mesh>,
-    material: &'a Handle<StandardMaterial>,
 }
 
 fn spawn_actors(
@@ -115,18 +135,16 @@ fn spawn_actors(
 ) {
     let mesh = meshes.add(Mesh::from(shape::Cube { size: 1.0 }));
     let mat = materials.add(Color::rgb(0.8, 0.7, 0.6).into());
-    
+
     for i in 0..100 {
         // spawn actor spheres
-        commands.spawn_bundle(ActorBundle {
-            object: ActorObjectBundle {
-                transform: Transform::from_xyz(i as f32, 0.0, 0.0),
-                global_transform: GlobalTransform::default(),
-                mesh: mesh.clone(),
-                material: mat.clone(),
-            },
-            stats: ActorStatBundle::new(format!("Actor {}", i), false),
-        });
+        commands.spawn_bundle(ActorBundle::new(
+            Transform::from_translation(Vec3::new(i as f32, 0.0, 0.0)),
+            mesh.clone(),
+            mat.clone(),
+            format!("Actor {}", i),
+            false,
+        ));
     }
 }
 
@@ -136,9 +154,9 @@ fn iterate_actors(query: Query<ActorQuery>) {
     }
 }
 
-pub struct ActorPlugin;
+pub struct ActorSystem;
 
-impl Plugin for ActorPlugin {
+impl Plugin for ActorSystem {
     fn build(&self, app: &mut App) {
         app.add_startup_system(spawn_actors)
             .add_system(iterate_actors);
