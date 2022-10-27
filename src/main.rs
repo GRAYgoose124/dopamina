@@ -13,10 +13,7 @@ pub struct Dopamina;
 
 impl PluginGroup for Dopamina {
     fn build(&mut self, group: &mut PluginGroupBuilder) {
-        group
-            .add(Scene)
-            .add(CharacterManager)
-            .add(PlayerController);
+        group.add(Scene).add(CharacterManager).add(PlayerController);
     }
 }
 

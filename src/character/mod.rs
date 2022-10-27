@@ -6,10 +6,9 @@ mod physics_actor;
 mod player;
 
 pub mod prelude {
-    pub use crate::character::CharacterManager;
     pub use crate::character::player::PlayerController;
+    pub use crate::character::CharacterManager;
 }
-
 
 #[derive(Component, Debug)]
 pub struct Health(f32);
@@ -80,7 +79,6 @@ pub struct Name(String);
 #[derive(Component, Debug)]
 pub struct IsPlayer(bool);
 
-
 #[derive(Component, Bundle)]
 pub struct CharacterActor {
     name: Name,
@@ -96,9 +94,15 @@ pub struct CharacterActor {
 }
 
 impl CharacterActor {
-    pub fn new(name: Name, is_player: bool, spawn_location: Transform, mesh: Handle<Mesh>, material: Handle<StandardMaterial>) -> Self {
+    pub fn new(
+        name: &str,
+        is_player: bool,
+        spawn_location: Transform,
+        mesh: Handle<Mesh>,
+        material: Handle<StandardMaterial>,
+    ) -> Self {
         Self {
-            name,
+            name: Name(name.to_string()),
             is_player: IsPlayer(is_player),
             object: PhysicsActor::new(spawn_location, mesh, material),
             stats: CharacterStats::new(),
@@ -110,38 +114,37 @@ impl CharacterActor {
 pub struct ActorQuery<'a> {
     name: &'a Name,
     stats: &'a CharacterStats,
-    actor: &'a PhysicsActor
+    actor: &'a PhysicsActor,
 }
 
 fn _iterate_characters(query: Query<ActorQuery>) {
     for character in query.iter() {
         let name = &character.name.0;
-        
+
         println!("Character: {:?}", name);
     }
 }
-
 
 fn spawn_actors(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let mesh = meshes.add(Mesh::from(shape::Cube { size: 1.0 }));
-    let mat = materials.add(Color::rgb(0.8, 0.7, 0.6).into());
+    let mesh = meshes.add(Mesh::from(shape::Cube { size: 10.0 }));
+    let mat = materials.add(Color::rgb(1.0, 0.0, 0.0).into());
 
-    for i in 0..100 {
-        commands.spawn_bundle( CharacterActor {
+    for i in 0..1000 {
+        commands.spawn_bundle(CharacterActor {
             name: Name(format!("Character {}", i)),
             is_player: IsPlayer(false),
             object: PhysicsActor::new(
-                Transform::from_translation(Vec3::new(i as f32, 0.0, 0.0)),
+                Transform::from_translation(Vec3::new((i % 10) as f32, (i + 1 % 10) as f32, (i + 2 % 10) as f32)),
                 mesh.clone(),
                 mat.clone(),
             ),
             stats: CharacterStats::new(),
         });
-    };
+    }
 }
 
 pub struct CharacterManager;
@@ -149,10 +152,10 @@ pub struct CharacterManager;
 impl Plugin for CharacterManager {
     fn build(&self, app: &mut App) {
         app.add_startup_system(spawn_actors)
-            .add_system_set(
-                SystemSet::new()
-                    .with_run_criteria(FixedTimestep::step(physics_actor::TIME_STEP as f64))
-                    .with_system(physics_actor::update_physics),
-            );
+        .add_system_set(
+            SystemSet::new()
+                .with_run_criteria(FixedTimestep::step(physics_actor::TIME_STEP))
+                .with_system(physics_actor::update_physics),
+        );
     }
 }

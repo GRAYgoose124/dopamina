@@ -1,12 +1,10 @@
 use std::ops::Add;
 
-use bevy::{prelude::*};
+use bevy::prelude::*;
 
-pub const TIME_STEP: f64 = 1.0 / 60.0;
+pub const TIME_STEP: f64 = 1.0 / 1.0;
 const GRAVITY: Vec3 = Vec3::new(0.0, -1.0, 0.0);
 const DRAG: Vec3 = Vec3::new(-0.01, -0.01, -0.01);
-
-
 
 #[derive(Component, Debug, Default)]
 pub struct Velocity(Vec3);
@@ -42,7 +40,10 @@ impl PhysicsActor {
 
 // TODO: maybe make this pub.
 /// Simple Query which provides an iterator over all actors, letting you access them publically.
-pub fn update_physics(time: Res<Time>, mut query: Query<(&mut Velocity, &mut Acceleration, &mut Transform)>) {
+pub fn update_physics(
+    time: Res<Time>,
+    mut query: Query<(&mut Velocity, &mut Acceleration, &mut Transform)>,
+) {
     let delta = time.delta_seconds();
     for (mut velocity, mut acceleration, mut transform) in query.iter_mut() {
         transform.translation = transform.translation.add(velocity.0) * delta;

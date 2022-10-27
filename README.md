@@ -18,8 +18,6 @@ It probably wants to be a 3D roguelite when it grows up.
 Check `target/release/` for your binary named `dopamina`. 
 ```bash
     > cd target/release/
-    > chmod +x dopamina
-    
     > ./dopamina
 ```
 
