@@ -1,3 +1,5 @@
+use std::ops::Add;
+
 use bevy::{ecs::query::WorldQuery, prelude::*};
 
 #[derive(Component, Debug)]
@@ -29,7 +31,7 @@ struct Wisdom(f32);
 struct Charisma(f32);
 
 #[derive(Bundle, Debug)]
-pub struct ActorStatBundle {
+pub struct CharacterStats {
     name: Name,
     is_player: IsPlayer,
 
@@ -47,7 +49,7 @@ pub struct ActorStatBundle {
     charisma: Charisma,
 }
 
-impl ActorStatBundle {
+impl CharacterStats {
     fn new(name: String, is_player: bool) -> Self {
         Self {
             name: Name(name),
@@ -69,21 +71,31 @@ impl ActorStatBundle {
     }
 }
 
-impl Default for ActorStatBundle {
+impl Default for CharacterStats {
     fn default() -> Self {
         Self::new("".to_string(), false)
     }
 }
 
+const GRAVITY: Vec3 = Vec3::new(0.0, -1.0, 0.0);
+const DRAG: Vec3 = Vec3::new(-0.01, -0.01, -0.01);
+
+#[derive(Component, Debug, Default)]
+struct Velocity(Vec3);
+#[derive(Component, Debug, Default)]
+struct Acceleration(Vec3);
+
 #[derive(Bundle, Debug)]
-pub struct ActorObjectBundle {
+pub struct PhysicsActor {
     transform: Transform,
+    velocity: Velocity,
+    acceleration: Acceleration,
     global_transform: GlobalTransform,
     mesh: Handle<Mesh>,
     material: Handle<StandardMaterial>,
 }
 
-impl ActorObjectBundle {
+impl PhysicsActor {
     pub fn new(
         transform: Transform,
         mesh: Handle<Mesh>,
@@ -91,6 +103,8 @@ impl ActorObjectBundle {
     ) -> Self {
         Self {
             transform,
+            velocity: Velocity::default(),
+            acceleration: Acceleration::default(),
             global_transform: GlobalTransform::default(),
             mesh,
             material,
@@ -99,17 +113,17 @@ impl ActorObjectBundle {
 }
 
 #[derive(Bundle)]
-pub struct ActorBundle {
+pub struct CharacterActor {
     // 3D object data
     #[bundle]
-    object: ActorObjectBundle,
+    object: PhysicsActor,
 
     // Character data
     #[bundle]
-    stats: ActorStatBundle,
+    stats: CharacterStats,
 }
 
-impl ActorBundle {
+impl CharacterActor {
     pub fn new(
         transform: Transform,
         mesh: Handle<Mesh>,
@@ -118,8 +132,8 @@ impl ActorBundle {
         is_player: bool,
     ) -> Self {
         Self {
-            object: ActorObjectBundle::new(transform, mesh, material),
-            stats: ActorStatBundle::new(name, is_player),
+            object: PhysicsActor::new(transform, mesh, material),
+            stats: CharacterStats::new(name, is_player),
         }
     }
 }
@@ -141,9 +155,8 @@ fn spawn_actors(
     let mat = materials.add(Color::rgb(0.8, 0.7, 0.6).into());
 
     for i in 0..100 {
-        // spawn actor spheres
-        commands.spawn_bundle(ActorBundle::new(
-            Transform::from_translation(Vec3::new(i as f32, 0.0, 0.0)),
+        commands.spawn_bundle(CharacterActor::new(
+            Transform::from_translation(Vec3::new((i % 10) as f32, (i % 10) as f32, (i % 10) as f32)),
             mesh.clone(),
             mat.clone(),
             format!("Actor {}", i),
@@ -152,8 +165,19 @@ fn spawn_actors(
     }
 }
 
-fn iterate_actors(query: Query<ActorQuery>) {
+fn _iterate_actors(query: Query<ActorQuery>) {
     for _actor in query.iter() {}
+}
+
+fn update_physics(mut query: Query<(&mut Transform, &mut Velocity, &mut Acceleration)>) {
+    for (mut transform, mut velocity, mut acceleration) in query.iter_mut() {
+        transform.translation = transform.translation.add(velocity.0);
+
+        velocity.0 = velocity.0.add(acceleration.0);
+        velocity.0 = velocity.0.add(GRAVITY);
+
+        acceleration.0 = acceleration.0.add(DRAG);
+    }
 }
 
 pub struct ActorSystem;
@@ -161,6 +185,6 @@ pub struct ActorSystem;
 impl Plugin for ActorSystem {
     fn build(&self, app: &mut App) {
         app.add_startup_system(spawn_actors)
-            .add_system(iterate_actors);
+            .add_system(update_physics);
     }
 }

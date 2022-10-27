@@ -15,7 +15,13 @@ It probably wants to be a 3D roguelite when it grows up.
 ```bash
     > cargo build --release --no-default-features
 ```
-Check `targets/release/` for your binary. 
+Check `target/release/` for your binary named `dopamina`. 
+```bash
+    > cd target/release/
+    > chmod +x dopamina
+    
+    > ./dopamina
+```
 
 ## About
 
