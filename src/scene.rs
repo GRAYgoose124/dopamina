@@ -8,6 +8,7 @@ fn setup(
 ) {
     // ground plane
     commands.spawn_bundle(PbrBundle {
+        transform: Transform::from_xyz(0.0, 0.0, 0.0),
         mesh: meshes.add(shape::Plane { size: 50. }.into()),
         material: materials.add(Color::SILVER.into()),
         ..default()

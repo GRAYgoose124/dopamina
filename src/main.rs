@@ -1,21 +1,22 @@
 use bevy::app::PluginGroupBuilder;
 use bevy::prelude::*;
 
-mod actor;
-mod player;
+mod character;
 mod scene;
 
 use bevy::prelude::PluginGroup;
 
-use crate::actor::ActorSystem;
-use crate::player::PlayerController;
+use crate::character::prelude::*;
 use crate::scene::Scene;
 
 pub struct Dopamina;
 
 impl PluginGroup for Dopamina {
     fn build(&mut self, group: &mut PluginGroupBuilder) {
-        group.add(Scene).add(ActorSystem).add(PlayerController);
+        group
+            .add(Scene)
+            .add(CharacterManager)
+            .add(PlayerController);
     }
 }
 
