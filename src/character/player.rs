@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
-
+use bevy_rapier3d::prelude::*;
 use crate::character::CharacterActor;
 
 #[derive(Component)]
@@ -20,20 +20,20 @@ fn spawn_player(
     let mat = Color::rgb(0.8, 0.7, 0.6).into();
 
     commands
-        .spawn_bundle(Camera3dBundle {
-            transform: spawn_location.looking_at(Vec3::ZERO, Vec3::Y),
-            ..default()
-        })
-        .insert(FlyCam)
-        .insert(Player)
-        .insert_bundle(CharacterActor::new(
-            "Player",
-            true,
-            // TODO: Physical location not connected to camera.
-            spawn_location,
-            meshes.add(mesh),
-            materials.add(mat),
-        ));
+    .spawn_bundle(CharacterActor::new(
+        "Player",
+        spawn_location,
+        meshes.add(mesh),
+        materials.add(mat),
+        Collider::cuboid(0.5, 0.5, 0.5),
+    ))
+    .insert_bundle(Camera3dBundle {
+        transform: Transform::from_xyz(0.0, 0.0, 0.0)
+            .looking_at(Vec3::ZERO, Vec3::Y),
+        ..default()
+    }).insert(FlyCam)
+    .insert(Player);
+            
 }
 
 
