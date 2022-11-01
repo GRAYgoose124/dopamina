@@ -2,7 +2,7 @@ use crate::scene::TIME_STEP;
 
 use super::actor::{CharacterActor, Identifier};
 use bevy::{ecs::query::WorldQuery, prelude::*, time::FixedTimestep};
-use bevy_rapier3d::prelude::Collider;
+use bevy_rapier3d::prelude::{Collider, RigidBody};
 
 #[derive(Component, Debug)]
 pub struct NPC;
@@ -16,15 +16,32 @@ fn spawn_npcs(
     let mat = materials.add(Color::rgb(1.0, 0.0, 0.0).into());
 
     for i in 0..1000 {
+        let random_spawn = Vec3::new(
+            rand::random::<f32>() * 100.0 - 50.0,
+            rand::random::<f32>() * 100.0 + 10.0,
+            rand::random::<f32>() * 100.0 - 50.0,
+        );
         commands
-            .spawn_bundle(CharacterActor::new(
-                &format!("NPC {}", i),
-                Transform::from_xyz(i as f32, 0.0, 0.0),
-                mesh.clone(),
-                mat.clone(),
-                Collider::cuboid(0.5, 0.5, 0.5),
-            ))
-            .insert(NPC);
+            .spawn_bundle(SpatialBundle {
+                transform: Transform::from_translation(random_spawn),
+                visibility: Visibility {
+                    is_visible: true,
+                },
+                ..Default::default()
+            }).with_children(|parent| {
+                parent.spawn_bundle(PbrBundle {
+                    mesh: mesh.clone(),
+                    material: mat.clone(),
+                    ..Default::default()
+                });
+                
+
+                parent.spawn_bundle(CharacterActor::new(
+                    &format!("NPC_{}", i),
+                )).insert(NPC);
+            })
+            .insert(RigidBody::Dynamic)
+            .insert(Collider::cuboid(0.5, 0.5, 0.5));
     }
 }
 

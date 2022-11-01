@@ -18,36 +18,17 @@ pub struct CharacterActor {
     pub name: CharName,
     #[bundle]
     pub stats: CharacterStats,
-
-    // Object data
-    mesh: Handle<Mesh>,
-    material: Handle<StandardMaterial>,
-    transform: Transform,
-
-    collider: Collider,
-    rigidbody: RigidBody,
 }
 
 impl CharacterActor {
     pub fn new(
         name: &str,
-        spawn_location: Transform,
-        mesh: Handle<Mesh>,
-        material: Handle<StandardMaterial>,
-        collider: Collider,
     ) -> Self {
         Self {
             id: Identifier(Uuid::new_v4()),
 
             name: CharName(name.to_string()),
             stats: CharacterStats::new(),
-
-            transform: spawn_location,
-            mesh,
-            material,
-
-            rigidbody: RigidBody::Dynamic,
-            collider,
         }
     }
 }
