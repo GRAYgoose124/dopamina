@@ -1,5 +1,7 @@
 use bevy::prelude::*;
-use bevy_rapier3d::prelude::{RigidBody, Collider};
+use bevy_rapier3d::prelude::{Collider, RigidBody};
+
+pub const TIME_STEP: f64 = 1.0 / 60.0;
 
 fn setup(
     mut commands: Commands,
@@ -8,13 +10,15 @@ fn setup(
     _asset_server: Res<AssetServer>,
 ) {
     // ground plane
-    commands.spawn_bundle(PbrBundle {
-        transform: Transform::from_xyz(0.0, 0.0, 0.0),
-        mesh: meshes.add(shape::Plane { size: 200. }.into()),
-        material: materials.add(Color::SEA_GREEN.into()),
-        ..default()
-    }).insert(RigidBody::Fixed)
-    .insert(Collider::cuboid(100.0, 0.0, 100.0));
+    commands
+        .spawn_bundle(PbrBundle {
+            transform: Transform::from_xyz(0.0, 0.0, 0.0),
+            mesh: meshes.add(shape::Plane { size: 200. }.into()),
+            material: materials.add(Color::SEA_GREEN.into()),
+            ..default()
+        })
+        .insert(RigidBody::Fixed)
+        .insert(Collider::cuboid(100.0, 0.0, 100.0));
 
     // // Spawn a camera looking at the entities to show what's happening in this example.
     // commands.spawn_bundle(Camera3dBundle {

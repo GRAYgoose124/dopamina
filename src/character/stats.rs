@@ -1,4 +1,4 @@
-use bevy::prelude::{Component, Bundle};
+use bevy::prelude::{Bundle, Component};
 
 #[derive(Component, Debug)]
 pub struct Health(f32);
@@ -24,7 +24,6 @@ pub struct Intelligence(f32);
 pub struct Wisdom(f32);
 #[derive(Component, Debug)]
 pub struct Charisma(f32);
-
 
 #[derive(Component, Bundle, Debug)]
 pub struct CharacterStats {

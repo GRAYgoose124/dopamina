@@ -1,34 +1,30 @@
-use bevy::app::PluginGroupBuilder;
 use bevy::prelude::*;
 
 mod character;
 mod scene;
 
-use bevy::prelude::PluginGroup;
-
-use crate::character::prelude::*;
 use crate::scene::Scene;
-
-pub struct Dopamina;
-
-impl PluginGroup for Dopamina {
-    fn build(&mut self, group: &mut PluginGroupBuilder) {
-        group.add(Scene).add(CharacterManager).add(PlayerController);
-    }
-}
+use bevy_flycam::MovementSettings;
+use character::Characters;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugins(Dopamina)
         .add_startup_system(setup)
+        .add_plugin(Scene)
+        .add_plugins(Characters)
         .run();
 }
 
 fn setup(
-    mut _commands: Commands,
+    mut commands: Commands,
     mut _meshes: ResMut<Assets<Mesh>>,
     mut _materials: ResMut<Assets<StandardMaterial>>,
     _asset_server: Res<AssetServer>,
 ) {
+    commands.insert_resource(MovementSettings {
+        speed: 20.0,
+        sensitivity: 0.1,
+        ..Default::default()
+    });
 }
