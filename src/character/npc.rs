@@ -35,7 +35,6 @@ fn spawn_npcs(
                     ..Default::default()
                 });
                 
-
                 parent.spawn_bundle(CharacterActor::new(
                     &format!("NPC_{}", i),
                 )).insert(NPC);

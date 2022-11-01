@@ -1,5 +1,4 @@
 use bevy::{prelude::*, reflect::Uuid};
-use bevy_rapier3d::prelude::*;
 
 use super::prelude::CharacterStats;
 

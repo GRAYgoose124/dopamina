@@ -5,7 +5,7 @@ mod character;
 mod scene;
 
 use crate::scene::Scene;
-use bevy_flycam::MovementSettings;
+use bevy_rapier_cam::MovementSettings;
 use character::Characters;
 
 fn main() {

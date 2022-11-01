@@ -1,6 +1,6 @@
 use bevy::prelude::*;
-use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
 use bevy_rapier3d::prelude::*;
+use bevy_rapier_cam::{FlyCam, NoCameraPlayerPlugin};
 
 use crate::character::actor::CharacterActor;
 
@@ -14,9 +14,9 @@ fn spawn_player(
 ) {
     let spawn_location = Transform::from_xyz(0.0, 10.0, 0.0);
 
-    let mesh = Mesh::from(shape::Icosphere {
-        radius: 1.0,
-        subdivisions: 4,
+    let mesh = Mesh::from(shape::Capsule {
+        radius: 0.5,
+        ..Default::default()
     });
     let mat = Color::rgb(0.8, 0.7, 0.6).into();
 
@@ -32,18 +32,20 @@ fn spawn_player(
                 mesh: meshes.add(mesh),
                 material: materials.add(mat),
                 ..Default::default()
-            })
-            .insert(RigidBody::Dynamic)
-            .insert(Collider::capsule_y(0.5, 0.5));
-            
+            });
+          
             parent.spawn_bundle(CharacterActor::new(
                 "Player",
             )).insert(Player);
             parent.spawn_bundle(Camera3dBundle {
                 ..default()
             })
+            // TODO: Flycam doesn't interact with rapier.
             .insert(FlyCam);            
-        });
+        })   
+        .insert(RigidBody::Dynamic)
+        .insert(Collider::capsule_y(0.5, 0.5));
+       
 }
 
 pub struct PlayerController;

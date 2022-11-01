@@ -18,7 +18,7 @@ fn setup(
             ..default()
         })
         .insert(RigidBody::Fixed)
-        .insert(Collider::cuboid(100.0, 0.0, 100.0));
+        .insert(Collider::cuboid(100.0, 0.5, 100.0));
 
     // light source
     commands.spawn_bundle(PointLightBundle {
